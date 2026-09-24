@@ -27,6 +27,7 @@ import RecruiterProfile from "../pages/recruiter/RecruiterProfile";
 import ViewApplications from "../pages/recruiter/ViewApplications";
 import CandidateSearch from "../pages/recruiter/CandidateSearch";
 import CvPackages from "../pages/recruiter/CvPackages";
+import Messages from "../pages/Messages";
 
 // ==================== ADMIN ====================
 import AdminDashboard from "../pages/admin/AdminDashboard";
@@ -143,6 +144,24 @@ export default function AppRoutes() {
         }
       />
 
+      <Route
+        path="/messages"
+        element={
+          <Protected role="jobseeker">
+            <Messages />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/messages/:applicationId"
+        element={
+          <Protected role="jobseeker">
+            <Messages />
+          </Protected>
+        }
+      />
+
 
       {/* =====================================================
           RECRUITER ROUTES
@@ -216,6 +235,24 @@ export default function AppRoutes() {
         element={
           <Protected role="recruiter">
             <CvPackages />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/recruiter/messages"
+        element={
+          <Protected role="recruiter">
+            <Messages />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/recruiter/messages/:applicationId"
+        element={
+          <Protected role="recruiter">
+            <Messages />
           </Protected>
         }
       />

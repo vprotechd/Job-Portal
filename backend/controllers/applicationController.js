@@ -6,6 +6,7 @@ import Job from "../models/Job.js";
 import User from "../models/User.js";
 import CvAccess from "../models/CvAccess.js";
 import { getCvAccessState, unlockCandidate } from "../services/cvAccessService.js";
+import Notification from "../models/Notification.js";
 
 // =====================================================
 // CANDIDATE APPLY FOR JOB
@@ -108,6 +109,14 @@ export const applyForJob = async (req, res) => {
       $inc: {
         applicationsCount: 1,
       },
+    });
+
+    await Notification.create({
+      recipient: job.recruiter,
+      type: "application",
+      title: "New job application",
+      body: `${candidate.name} applied for ${job.title}.`,
+      link: "/recruiter/applications",
     });
 
     const populatedApplication =

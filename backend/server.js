@@ -16,6 +16,8 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import adminAdvancedRoutes from "./routes/adminAdvancedRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import fileRoutes from "./routes/fileRoutes.js";
+import messageRoutes from "./routes/messageRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 dotenv.config();
 
@@ -153,6 +155,12 @@ app.use("/api/applications", applicationRoutes);
 
 app.use("/api/files", fileRoutes);
 
+// Candidate/recruiter messaging. Access is enforced in messageController.
+app.use("/api/messages", messageRoutes);
+
+// In-app notifications for applications, messages and account activity.
+app.use("/api/notifications", notificationRoutes);
+
 // ============================================================
 // PROFILE ROUTES
 // ============================================================
@@ -202,6 +210,13 @@ app.use((err, req, res, next) => {
     return res.status(413).json({
       success: false,
       message: "Request payload is too large.",
+    });
+  }
+
+  if (err?.status === 400) {
+    return res.status(400).json({
+      success: false,
+      message: err.message || "Invalid request.",
     });
   }
 

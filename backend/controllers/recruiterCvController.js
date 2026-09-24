@@ -4,6 +4,7 @@ import path from "path";
 import User from "../models/User.js";
 import CvAccess from "../models/CvAccess.js";
 import { getCvAccessState, unlockCandidate, getGlobalSettings } from "../services/cvAccessService.js";
+import Notification from "../models/Notification.js";
 
 const safeCandidate = (candidate, req) => ({
   _id: candidate._id,
@@ -86,6 +87,13 @@ export const unlockCandidateCv = async (req, res) => {
     if (!candidate.resume) return res.status(404).json({ success: false, message: "This candidate has not uploaded a resume." });
     const result = await unlockCandidate({ recruiterId: req.user._id, candidateId: candidate._id });
     const access = result.access.toObject ? result.access.toObject() : result.access;
+    await Notification.create({
+      recipient: candidate._id,
+      type: "cv_unlock",
+      title: "Your CV was unlocked",
+      body: `${req.user.name || "A recruiter"} unlocked your CV and can now message you.`,
+      link: "/messages",
+    });
     return res.json({ success: true, charged: result.charged, source: result.source, candidate, access, cvAccess: await getCvAccessState(req.user._id) });
   } catch (error) {
     console.error("Unlock candidate CV error:", error);

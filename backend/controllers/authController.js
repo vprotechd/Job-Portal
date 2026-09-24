@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
+import axios from "axios";
 
 import sendEmail from "../utils/sendEmail.js";
 import generateToken from "../utils/generateToken.js";
@@ -556,5 +557,112 @@ export const resetPassword = async (req, res) => {
       success: false,
       message: "Unable to reset password.",
     });
+  }
+};
+
+// =====================================================
+// LOGIN OTP
+// =====================================================
+
+export const requestLoginOTP = async (req, res) => {
+  try {
+    const email = String(req.body?.email || "").toLowerCase().trim();
+    if (!email) return res.status(400).json({ success: false, message: "Email is required." });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ success: false, message: "No account was found for this email." });
+    if (!user.isVerified) return res.status(403).json({ success: false, message: "Please verify your email before using OTP login.", requiresVerification: true });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otp = otp;
+    user.otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    await sendEmail({
+      to: user.email,
+      subject: "Jobify - Login OTP",
+      html: `<div style="font-family:Arial,sans-serif;padding:30px"><h2>Jobify Login</h2><p>Hello ${user.name},</p><p>Your login OTP is:</p><h1 style="letter-spacing:8px">${otp}</h1><p>This OTP expires in 10 minutes.</p></div>`,
+    });
+
+    return res.json({ success: true, message: "Login OTP sent successfully.", email: user.email });
+  } catch (error) {
+    console.error("Request login OTP error:", error);
+    return res.status(500).json({ success: false, message: error.message || "Unable to send login OTP." });
+  }
+};
+
+export const verifyLoginOTP = async (req, res) => {
+  try {
+    const email = String(req.body?.email || "").toLowerCase().trim();
+    const otp = String(req.body?.otp || "").trim();
+    if (!email || !otp) return res.status(400).json({ success: false, message: "Email and OTP are required." });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ success: false, message: "User not found." });
+    if (!user.isVerified) return res.status(403).json({ success: false, message: "Please verify your email first." });
+    if (!user.otp || !user.otpExpires || user.otpExpires < new Date()) return res.status(400).json({ success: false, message: "OTP expired. Please request a new one." });
+    if (user.otp !== otp) return res.status(400).json({ success: false, message: "Invalid OTP." });
+
+    user.otp = null;
+    user.otpExpires = null;
+    await user.save();
+    const token = generateToken(user);
+    return res.json({
+      success: true,
+      message: "Login successful",
+      token,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
+    });
+  } catch (error) {
+    console.error("Verify login OTP error:", error);
+    return res.status(500).json({ success: false, message: "Unable to verify login OTP." });
+  }
+};
+
+// =====================================================
+// GOOGLE LOGIN
+// =====================================================
+
+export const googleLogin = async (req, res) => {
+  try {
+    const credential = String(req.body?.credential || "").trim();
+    if (!credential) return res.status(400).json({ success: false, message: "Google credential is required." });
+    if (!process.env.GOOGLE_CLIENT_ID) return res.status(503).json({ success: false, message: "Google login is not configured on the server." });
+
+    const { data } = await axios.get("https://oauth2.googleapis.com/tokeninfo", { params: { id_token: credential }, timeout: 10000 });
+    if (data.aud !== process.env.GOOGLE_CLIENT_ID) return res.status(401).json({ success: false, message: "Invalid Google login audience." });
+    if (!data.email || data.email_verified !== "true") return res.status(401).json({ success: false, message: "Your Google email could not be verified." });
+
+    const email = String(data.email).toLowerCase().trim();
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      const generatedPassword = crypto.randomBytes(24).toString("hex");
+      user = new User({
+        name: data.name || email.split("@")[0],
+        email,
+        password: generatedPassword,
+        role: "jobseeker",
+        isVerified: true,
+        googleId: data.sub || "",
+        profileImage: data.picture || "",
+      });
+    } else {
+      if (user.googleId !== data.sub) user.googleId = data.sub || user.googleId;
+      if (!user.isVerified) user.isVerified = true;
+      if (!user.profileImage && data.picture) user.profileImage = data.picture;
+    }
+
+    await user.save();
+    const token = generateToken(user);
+    return res.json({
+      success: true,
+      message: "Google login successful",
+      token,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
+    });
+  } catch (error) {
+    console.error("Google login error:", error?.response?.data || error);
+    return res.status(401).json({ success: false, message: "Unable to sign in with Google." });
   }
 };

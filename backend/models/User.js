@@ -23,6 +23,13 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
     },
 
+    googleId: {
+      type: String,
+      default: "",
+      index: true,
+      sparse: true,
+    },
+
     role: {
       type: String,
       enum: ["jobseeker", "recruiter", "admin"],

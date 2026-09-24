@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FiArrowLeft,
   FiBriefcase,
@@ -10,6 +10,7 @@ import {
   FiEye,
   FiFilter,
   FiMail,
+  FiMessageCircle,
   FiMapPin,
   FiPhone,
   FiRefreshCw,
@@ -21,6 +22,7 @@ import {
 import api from "../../services/api";
 
 export default function ViewApplications() {
+  const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -44,6 +46,11 @@ export default function ViewApplications() {
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
+      setSelectedApplication((current) =>
+        current && current._id === applicationId
+          ? { ...current, cvUnlocked: true }
+          : current
+      );
       setTimeout(() => URL.revokeObjectURL(url), 60000);
     } catch (error) {
       alert(error?.response?.data?.message || "Unable to download candidate resume.");
@@ -693,6 +700,8 @@ export default function ViewApplications() {
             setSelectedApplication(null)
           }
           onStatusUpdate={updateStatus}
+          onResumeDownload={downloadResume}
+          onMessage={() => navigate(`/recruiter/messages/${selectedApplication._id}`)}
         />
       )}
 
@@ -709,6 +718,8 @@ function ApplicationDetails({
   loading,
   onClose,
   onStatusUpdate,
+  onResumeDownload,
+  onMessage,
 }) {
   const candidate =
     application.candidate ||
@@ -1040,12 +1051,23 @@ function ApplicationDetails({
 
               <button
                 type="button"
-                onClick={() => downloadResume(application._id)}
+                onClick={() => onResumeDownload(application._id)}
                 className="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
                 <FiEye />
                 View / Download Resume
               </button>
+
+              {application.cvUnlocked && (
+                <button
+                  type="button"
+                  onClick={onMessage}
+                  className="ml-2 mt-4 inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-5 py-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-100"
+                >
+                  <FiMessageCircle />
+                  Message Candidate
+                </button>
+              )}
 
             </section>
           )}

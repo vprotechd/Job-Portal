@@ -12,6 +12,7 @@ import {
   FiSettings,
   FiCreditCard,
   FiUsers,
+  FiMessageCircle,
 } from "react-icons/fi";
 
 import api from "../../services/api";
@@ -370,6 +371,14 @@ export default function RecruiterDashboard() {
               Manage your jobs, candidates, and recruitment process.
             </p>
           </div>
+
+          <Link
+            to="/recruiter/messages"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 shadow-sm transition hover:border-blue-300 hover:text-blue-600"
+          >
+            <FiMessageCircle size={18} />
+            Messages
+          </Link>
 
           <Link
             to="/recruiter/jobs/create"

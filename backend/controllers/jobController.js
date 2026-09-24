@@ -59,19 +59,16 @@ export const createJob = async (req, res) => {
       });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(company)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid company ID.",
-      });
-    }
-
+    // The post-job form accepts a company name. If the value is an existing
+    // company ObjectId, use it; otherwise find/create the recruiter's company
+    // by name. The previous implementation rejected a valid company name
+    // before reaching the fallback branch, which caused HTTP 400 errors.
     let companyDoc = null;
 
     if (mongoose.Types.ObjectId.isValid(company)) {
       companyDoc = await Company.findOne({ _id: company, recruiter: recruiterId });
     } else {
-      const companyName = String(company).trim();
+      const companyName = String(company || "").trim();
       if (companyName) {
         companyDoc = await Company.findOne({ recruiter: recruiterId, name: companyName });
         if (!companyDoc) {

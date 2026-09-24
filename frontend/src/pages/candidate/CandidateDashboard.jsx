@@ -21,6 +21,7 @@ import {
   FiSearch,
   FiHeart,
   FiSend,
+  FiMessageCircle,
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 
@@ -775,6 +776,14 @@ export default function CandidateDashboard() {
                   >
                     <FiSend />
                     My Applications
+                  </Link>
+
+                  <Link
+                    to="/messages"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-blue-600"
+                  >
+                    <FiMessageCircle />
+                    Messages
                   </Link>
 
                   <Link

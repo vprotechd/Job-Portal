@@ -6,9 +6,11 @@ import {
   FiX,
   FiLogOut,
   FiUser,
+  FiMessageCircle,
 } from "react-icons/fi";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import NotificationBell from "./NotificationBell";
 
 
 export default function Navbar() {
@@ -87,6 +89,16 @@ export default function Navbar() {
 
           {isAuthenticated ? (
             <>
+              <NotificationBell />
+              <Link
+                to={user?.role === "recruiter" ? "/recruiter/messages" : "/messages"}
+                className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm hover:border-blue-300 hover:text-blue-600"
+                title="Messages"
+              >
+                <FiMessageCircle size={18} />
+                <span className="hidden lg:inline">Messages</span>
+              </Link>
+
               {/* Logged in user */}
               <Link
                 to={
@@ -202,6 +214,11 @@ export default function Navbar() {
 
               {isAuthenticated ? (
                 <div className="space-y-4">
+
+                  <div className="flex gap-3">
+                    <Link to={user?.role === "recruiter" ? "/recruiter/messages" : "/messages"} onClick={closeMenu} className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700"><FiMessageCircle /> Messages</Link>
+                    <div className="flex items-center"><NotificationBell /></div>
+                  </div>
 
                   {/* Mobile User */}
                   <Link
