@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -42,10 +43,7 @@ export default function RecruiterDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // =====================================================
   // LOAD LOGGED-IN RECRUITER
-  // =====================================================
-
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const token = localStorage.getItem("token");
@@ -64,7 +62,6 @@ export default function RecruiterDashboard() {
         } else {
           navigate("/jobs", { replace: true });
         }
-
         return;
       }
 
@@ -79,10 +76,7 @@ export default function RecruiterDashboard() {
     }
   }, [navigate]);
 
-  // =====================================================
   // FETCH RECRUITER DASHBOARD
-  // =====================================================
-
   useEffect(() => {
     const fetchDashboard = async () => {
       const token = localStorage.getItem("token");
@@ -96,20 +90,6 @@ export default function RecruiterDashboard() {
         setLoading(true);
         setError("");
 
-        /*
-         * api.js baseURL:
-         *
-         * http://localhost:5000/api
-         *
-         * Therefore:
-         *
-         * /recruiter/dashboard
-         *
-         * becomes:
-         *
-         * http://localhost:5000/api/recruiter/dashboard
-         */
-
         const response = await api.get("/recruiter/dashboard", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -120,51 +100,24 @@ export default function RecruiterDashboard() {
 
         console.log("Recruiter dashboard response:", data);
 
-        // =================================================
-        // AUTHORIZATION
-        // =================================================
-
-        if (response.status === 401 || response.status === 403) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-
-          navigate("/login", { replace: true });
-          return;
-        }
-
-        // =================================================
-        // SUCCESS
-        // =================================================
-
         if (!data.success) {
           throw new Error(
             data.message || "Unable to load recruiter dashboard."
           );
         }
 
-        // =================================================
-        // STATISTICS
-        // =================================================
-
         const statistics = data.statistics || data.stats || {};
 
         setStats({
           activeJobs: Number(statistics.activeJobs ?? 0),
-
           applications: Number(
             statistics.totalApplications ??
               statistics.applications ??
               0
           ),
-
           interviews: Number(statistics.interviews ?? 0),
-
           hired: Number(statistics.hired ?? 0),
         });
-
-        // =================================================
-        // RECENT APPLICATIONS
-        // =================================================
 
         setRecentApplications(
           Array.isArray(data.recentApplications)
@@ -179,10 +132,6 @@ export default function RecruiterDashboard() {
           }));
         }
 
-        // =================================================
-        // RECRUITER INFORMATION
-        // =================================================
-
         if (data.recruiter) {
           setUser((previousUser) => ({
             ...(previousUser || {}),
@@ -191,10 +140,6 @@ export default function RecruiterDashboard() {
         }
       } catch (err) {
         console.error("Recruiter dashboard error:", err);
-
-        // =================================================
-        // AUTH ERROR
-        // =================================================
 
         if (
           err.response?.status === 401 ||
@@ -206,10 +151,6 @@ export default function RecruiterDashboard() {
           navigate("/login", { replace: true });
           return;
         }
-
-        // =================================================
-        // OTHER ERROR
-        // =================================================
 
         setError(
           err.response?.data?.message ||
@@ -233,10 +174,7 @@ export default function RecruiterDashboard() {
     fetchDashboard();
   }, [navigate]);
 
-  // =====================================================
   // LOGOUT
-  // =====================================================
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -245,10 +183,7 @@ export default function RecruiterDashboard() {
     navigate("/login", { replace: true });
   };
 
-  // =====================================================
   // STAT CARDS
-  // =====================================================
-
   const statCards = [
     {
       title: "Active Jobs",
@@ -276,10 +211,7 @@ export default function RecruiterDashboard() {
     },
   ];
 
-  // =====================================================
   // STATUS COLORS
-  // =====================================================
-
   const getStatusClasses = (status) => {
     switch (status?.toLowerCase()) {
       case "reviewing":
@@ -304,14 +236,9 @@ export default function RecruiterDashboard() {
     }
   };
 
-  // =====================================================
   // DATE FORMAT
-  // =====================================================
-
   const formatDate = (date) => {
-    if (!date) {
-      return "—";
-    }
+    if (!date) return "—";
 
     const parsedDate = new Date(date);
 
@@ -326,13 +253,10 @@ export default function RecruiterDashboard() {
     });
   };
 
-  // =====================================================
   // LOADING
-  // =====================================================
-
   if (loading) {
     return (
-      <div className="flex min-h-[70vh] items-center justify-center bg-slate-50">
+      <div className="flex min-h-[70vh] items-center justify-center bg-slate-50 px-4">
         <div className="text-center">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
 
@@ -344,81 +268,76 @@ export default function RecruiterDashboard() {
     );
   }
 
-  // =====================================================
-  // DASHBOARD
-  // =====================================================
-
   return (
-    <div className="min-h-screen bg-slate-50">
-      <main className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
+    <div className="min-h-screen min-w-0 overflow-x-clip bg-slate-50">
+     
 
-        {/* ================================================= */}
-        {/* WELCOME */}
-        {/* ================================================= */}
+<main className="mx-auto w-full max-w-7xl min-w-0 px-4 pt-8 pb-6 sm:px-6 sm:pt-8 sm:pb-8 lg:px-8">
 
-        <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-center">
-          <div>
+
+
+        {/* WELCOME HEADER */}
+        <header className="mb-8 grid min-w-0 grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="min-w-0">
             <p className="text-sm font-semibold text-blue-600">
               Recruiter Dashboard
             </p>
 
-            <h1 className="mt-1 text-3xl font-bold text-slate-950">
-              Welcome back
-              {user?.name ? `, ${user.name}` : ""}
+            <h1 className="mt-1 break-words text-2xl font-bold text-slate-950 sm:text-3xl">
+              Welcome back{user?.name ? `, ${user.name}` : ""}
             </h1>
 
-            <p className="mt-2 text-slate-500">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
               Manage your jobs, candidates, and recruitment process.
             </p>
           </div>
 
-          <Link
-            to="/recruiter/messages"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 shadow-sm transition hover:border-blue-300 hover:text-blue-600"
-          >
-            <FiMessageCircle size={18} />
-            Messages
-          </Link>
+          <div className="flex min-w-0 flex-wrap items-center gap-3 lg:justify-end">
+            <Link
+              to="/recruiter/messages"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 font-semibold text-slate-700 shadow-sm transition hover:border-blue-300 hover:text-blue-600 sm:px-5"
+            >
+              <FiMessageCircle size={18} />
+              Messages
+            </Link>
 
-          <Link
-            to="/recruiter/jobs/create"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-blue-700"
-          >
-            <FiPlus size={18} />
-            Post a Job
-          </Link>
-        </div>
+            <Link
+              to="/recruiter/jobs/create"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white shadow-sm transition hover:bg-blue-700 sm:px-5"
+            >
+              <FiPlus size={18} />
+              Post a Job
+            </Link>
+          </div>
+        </header>
 
-        {/* ================================================= */}
         {/* ERROR */}
-        {/* ================================================= */}
-
         {error && (
-          <div className="mb-6 flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-            <span>{error}</span>
+          <div className="mb-6 flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700 sm:flex-row sm:items-center sm:justify-between">
+            <span className="break-words">{error}</span>
 
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="font-semibold hover:underline"
+              className="shrink-0 self-start font-semibold hover:underline sm:self-auto"
             >
               Try again
             </button>
           </div>
         )}
 
-        {/* ================================================= */}
         {/* STAT CARDS */}
-        {/* ================================================= */}
-
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <section
+          aria-label="Recruitment statistics"
+          className="grid min-w-0 grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
+        >
           {statCards.map((stat) => (
             <div
               key={stat.title}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+              className="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
             >
-              <div className="flex items-start justify-between">
-                <div>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
                   <p className="text-sm font-medium text-slate-500">
                     {stat.title}
                   </p>
@@ -432,60 +351,69 @@ export default function RecruiterDashboard() {
                   </p>
                 </div>
 
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                   {stat.icon}
                 </div>
               </div>
             </div>
           ))}
-        </div>
+        </section>
 
-        {/* ================================================= */}
         {/* RESUME ACCESS */}
-        {/* ================================================= */}
-
-        <section className="mt-8 rounded-2xl border border-blue-100 bg-blue-50/60 p-6">
+        <section className="mt-8 rounded-2xl border border-blue-100 bg-blue-50/60 p-4 sm:p-6">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-start gap-4">
+            <div className="flex min-w-0 items-start gap-4">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
                 <FiDownload size={20} />
               </div>
-              <div>
-                <h2 className="font-bold text-slate-950">Candidate Resume Downloads</h2>
-                <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
-                  You receive {resumeAccess.freeDownloadsTotal || 0} free candidate CV unlocks every month. After those are used, each new candidate CV unlock consumes {resumeAccess.creditCost || 1} paid credit.
+
+              <div className="min-w-0">
+                <h2 className="font-bold text-slate-950">
+                  Candidate Resume Downloads
+                </h2>
+
+                <p className="mt-1 max-w-2xl break-words text-sm leading-6 text-slate-600">
+                  You receive {resumeAccess.freeDownloadsTotal ?? 10} free
+                  candidate CV unlocks every month. After those are used,
+                  each new candidate CV unlock consumes{" "}
+                  {resumeAccess.creditCost ?? 1} paid credit.
                 </p>
               </div>
             </div>
-            <div className="flex shrink-0 gap-3">
-              <div className="rounded-xl bg-white px-4 py-3 text-center shadow-sm">
+
+            <div className="flex flex-wrap gap-3 md:shrink-0">
+              <div className="min-w-[125px] flex-1 rounded-xl bg-white px-4 py-3 text-center shadow-sm">
                 <p className="text-xs text-slate-500">Free remaining</p>
-                <p className="mt-1 text-xl font-bold text-blue-600">{resumeAccess.freeDownloadsRemaining}/{resumeAccess.freeDownloadsTotal || 0}</p>
+
+                <p className="mt-1 text-xl font-bold text-blue-600">
+                  {resumeAccess.freeDownloadsRemaining ?? 10}/
+                  {resumeAccess.freeDownloadsTotal ?? 10}
+                </p>
               </div>
-              <div className="rounded-xl bg-white px-4 py-3 text-center shadow-sm">
+
+              <div className="min-w-[100px] flex-1 rounded-xl bg-white px-4 py-3 text-center shadow-sm">
                 <p className="text-xs text-slate-500">Credits</p>
-                <p className="mt-1 text-xl font-bold text-slate-950">{resumeAccess.credits}</p>
+
+                <p className="mt-1 text-xl font-bold text-slate-950">
+                  {resumeAccess.credits ?? 0}
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ================================================= */}
         {/* QUICK ACTIONS */}
-        {/* ================================================= */}
-
-        <section className="mt-8">
+        <section className="mt-8 min-w-0">
           <h2 className="mb-4 text-lg font-bold text-slate-950">
             Quick Actions
           </h2>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
             {/* POST JOB */}
-
             <Link
               to="/recruiter/jobs/create"
-              className="group rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:shadow-md"
+              className="group min-w-0 rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:shadow-md"
             >
               <div className="flex items-center justify-between">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
@@ -508,10 +436,9 @@ export default function RecruiterDashboard() {
             </Link>
 
             {/* MANAGE JOBS */}
-
             <Link
               to="/recruiter/jobs"
-              className="group rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:shadow-md"
+              className="group min-w-0 rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:shadow-md"
             >
               <div className="flex items-center justify-between">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
@@ -534,42 +461,59 @@ export default function RecruiterDashboard() {
             </Link>
 
             {/* CANDIDATES */}
-
             <Link
               to="/recruiter/candidates"
-              className="group rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:shadow-md"
+              className="group min-w-0 rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:shadow-md"
             >
               <div className="flex items-center justify-between">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                   <FiUsers size={20} />
                 </div>
-                <FiArrowRight className="text-slate-300 transition group-hover:text-blue-600" size={20} />
+
+                <FiArrowRight
+                  className="text-slate-300 transition group-hover:text-blue-600"
+                  size={20}
+                />
               </div>
-              <h3 className="mt-4 font-semibold text-slate-950">Search Candidates</h3>
-              <p className="mt-1 text-sm text-slate-500">Search privacy-protected candidates and unlock CVs.</p>
+
+              <h3 className="mt-4 font-semibold text-slate-950">
+                Search Candidates
+              </h3>
+
+              <p className="mt-1 text-sm text-slate-500">
+                Search privacy-protected candidates and unlock CVs.
+              </p>
             </Link>
 
             {/* CV PACKAGES */}
-
             <Link
               to="/recruiter/packages"
-              className="group rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:shadow-md"
+              className="group min-w-0 rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:shadow-md"
             >
               <div className="flex items-center justify-between">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                   <FiCreditCard size={20} />
                 </div>
-                <FiArrowRight className="text-slate-300 transition group-hover:text-blue-600" size={20} />
+
+                <FiArrowRight
+                  className="text-slate-300 transition group-hover:text-blue-600"
+                  size={20}
+                />
               </div>
-              <h3 className="mt-4 font-semibold text-slate-950">Buy CV Credits</h3>
-              <p className="mt-1 text-sm text-slate-500">Purchase additional CV credits securely with Razorpay.</p>
+
+              <h3 className="mt-4 font-semibold text-slate-950">
+                Buy CV Credits
+              </h3>
+
+              <p className="mt-1 text-sm text-slate-500">
+                Purchase additional CV credits securely with Razorpay.
+              </p>
             </Link>
 
             {/* APPLICATIONS */}
-
             <Link
               to="/recruiter/applications"
-              className="group rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:shadow-md"
+              className="group min-w-0 rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:shadow-md"
             >
               <div className="flex items-center justify-between">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
@@ -593,14 +537,10 @@ export default function RecruiterDashboard() {
           </div>
         </section>
 
-        {/* ================================================= */}
         {/* RECENT APPLICATIONS */}
-        {/* ================================================= */}
-
-        <section className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-
-          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
-            <div>
+        <section className="mt-8 min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-col gap-3 border-b border-slate-100 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <div className="min-w-0">
               <h2 className="font-bold text-slate-950">
                 Recent Applications
               </h2>
@@ -612,7 +552,7 @@ export default function RecruiterDashboard() {
 
             <Link
               to="/recruiter/applications"
-              className="flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700"
+              className="inline-flex shrink-0 items-center gap-1 self-start text-sm font-semibold text-blue-600 hover:text-blue-700 sm:self-auto"
             >
               View all
               <FiArrowRight size={16} />
@@ -620,7 +560,7 @@ export default function RecruiterDashboard() {
           </div>
 
           {recentApplications.length === 0 ? (
-            <div className="px-6 py-14 text-center">
+            <div className="px-4 py-14 text-center sm:px-6">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
                 <FiFileText size={24} />
               </div>
@@ -630,14 +570,13 @@ export default function RecruiterDashboard() {
               </h3>
 
               <p className="mx-auto mt-1 max-w-md text-sm text-slate-500">
-                Applications from candidates will appear here when
-                they apply to your job listings.
+                Applications from candidates will appear here when they
+                apply to your job listings.
               </p>
             </div>
           ) : (
             <div className="divide-y divide-slate-100">
               {recentApplications.map((application) => {
-
                 const candidate =
                   application.candidate ||
                   application.user ||
@@ -667,8 +606,7 @@ export default function RecruiterDashboard() {
                   application.jobTitle ||
                   "Job";
 
-                const status =
-                  application.status || "pending";
+                const status = application.status || "pending";
 
                 return (
                   <div
@@ -677,29 +615,25 @@ export default function RecruiterDashboard() {
                       application.id ||
                       `${candidateEmail}-${jobTitle}`
                     }
-                    className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between"
+                    className="flex min-w-0 flex-col gap-4 px-4 py-5 sm:px-6 md:flex-row md:items-center md:justify-between"
                   >
-
                     {/* Candidate */}
-
-                    <div className="flex items-center gap-4">
+                    <div className="flex min-w-0 items-center gap-4">
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 font-semibold text-blue-600">
-                        {candidateName
-                          .charAt(0)
-                          .toUpperCase()}
+                        {candidateName.charAt(0).toUpperCase()}
                       </div>
 
-                      <div>
-                        <h3 className="font-semibold text-slate-900">
+                      <div className="min-w-0">
+                        <h3 className="break-words font-semibold text-slate-900">
                           {candidateName}
                         </h3>
 
-                        <p className="text-sm text-slate-500">
+                        <p className="break-words text-sm text-slate-500">
                           {jobTitle}
                         </p>
 
                         {candidateEmail && (
-                          <p className="mt-0.5 text-xs text-slate-400">
+                          <p className="mt-0.5 break-all text-xs text-slate-400">
                             {candidateEmail}
                           </p>
                         )}
@@ -707,8 +641,7 @@ export default function RecruiterDashboard() {
                     </div>
 
                     {/* Application Info */}
-
-                    <div className="flex flex-wrap items-center gap-4 sm:justify-end">
+                    <div className="flex flex-wrap items-center gap-4 md:justify-end">
                       <div className="flex items-center gap-2 text-sm text-slate-400">
                         <FiClock size={15} />
 
@@ -727,7 +660,6 @@ export default function RecruiterDashboard() {
                         {status}
                       </span>
                     </div>
-
                   </div>
                 );
               })}
@@ -735,21 +667,17 @@ export default function RecruiterDashboard() {
           )}
         </section>
 
-        {/* ================================================= */}
         {/* BOTTOM CARDS */}
-        {/* ================================================= */}
-
-        <section className="mt-8 grid gap-6 md:grid-cols-2">
+        <section className="mt-8 grid min-w-0 grid-cols-1 gap-6 md:grid-cols-2">
 
           {/* JOBS */}
-
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                 <FiBriefcase />
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <h3 className="font-bold text-slate-950">
                   Your Job Listings
                 </h3>
@@ -770,14 +698,13 @@ export default function RecruiterDashboard() {
           </div>
 
           {/* PROFILE */}
-
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+          <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                 <FiSettings />
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <h3 className="font-bold text-slate-950">
                   Recruiter Profile
                 </h3>
@@ -798,11 +725,8 @@ export default function RecruiterDashboard() {
           </div>
         </section>
 
-        {/* ================================================= */}
         {/* LOGOUT */}
-        {/* ================================================= */}
-
-        <div className="mt-8 flex justify-end">
+        <div className="mt-8 flex justify-end pb-6">
           <button
             type="button"
             onClick={handleLogout}
@@ -811,7 +735,6 @@ export default function RecruiterDashboard() {
             Logout
           </button>
         </div>
-
       </main>
     </div>
   );

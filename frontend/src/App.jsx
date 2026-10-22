@@ -12,7 +12,7 @@ function App() {
   return (
     <>
       <AppRoutes />
-      <BackButton />
+     
       <UserQuickActions />
       <ThemeToggle />
       <ToastContainer
