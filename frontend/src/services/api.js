@@ -49,10 +49,13 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  // `token` is the canonical Jobify access token.
+  // Legacy aliases are only fallbacks so an old/stale token cannot
+  // override the token created by the current login session.
   const token =
     localStorage.getItem("token") ||
-    localStorage.getItem("accessToken") ||
-    sessionStorage.getItem("token");
+    sessionStorage.getItem("token") ||
+    localStorage.getItem("accessToken");
 
   if (token) {
     config.headers = config.headers || {};

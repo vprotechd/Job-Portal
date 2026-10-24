@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import {
-  FiArrowLeft,
   FiBriefcase,
   FiCalendar,
   FiCheckCircle,
@@ -13,6 +12,7 @@ import {
   FiTag,
   FiX,
 } from "react-icons/fi";
+import BackLink from "../../components/layout/BackLink";
 
 export default function PostJob() {
   const navigate = useNavigate();
@@ -163,13 +163,7 @@ export default function PostJob() {
             </span>
           </Link>
 
-          <Link
-            to="/recruiter/dashboard"
-            className="flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-blue-600"
-          >
-            <FiArrowLeft />
-            Dashboard
-          </Link>
+          <BackLink to="/recruiter/dashboard">Dashboard</BackLink>
 
         </div>
       </header>

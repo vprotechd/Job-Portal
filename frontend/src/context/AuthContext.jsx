@@ -30,6 +30,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (token, userData) => {
+    // Keep one canonical access token and remove stale legacy aliases.
+    localStorage.removeItem("accessToken");
+    sessionStorage.removeItem("token");
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(userData));
 
@@ -38,6 +41,8 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("accessToken");
+    sessionStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("rememberMe");
 

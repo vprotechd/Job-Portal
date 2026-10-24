@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  FiArrowLeft,
   FiBriefcase,
   FiEdit2,
   FiEye,
@@ -16,6 +15,7 @@ import {
 } from "react-icons/fi";
 
 import api from "../../services/api";
+import BackLink from "../../components/layout/BackLink";
 
 export default function ManageJobs() {
   const navigate = useNavigate();
@@ -200,7 +200,7 @@ export default function ManageJobs() {
   };
 
   // =====================================================
-  // STATUS
+  // STATUS STYLE
   // =====================================================
 
   const getStatusStyle = (status) => {
@@ -227,7 +227,7 @@ export default function ManageJobs() {
     return (
       <div className="min-h-screen bg-slate-50">
 
-        <div className="flex min-h-[70vh] items-center justify-center">
+        <div className="flex min-h-[70vh] items-center justify-center px-6">
 
           <div className="text-center">
 
@@ -248,28 +248,26 @@ export default function ManageJobs() {
     );
   }
 
+  // =====================================================
+  // PAGE
+  // =====================================================
+
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-slate-50">
 
       {/* =================================================
           HEADER
       ================================================= */}
 
-      <div className="border-b border-slate-200 bg-white">
+      <header className="border-b border-slate-200 bg-white">
 
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-6 py-5 sm:flex-row sm:items-center sm:justify-between lg:px-8">
 
-          <div>
+          <div className="min-w-0">
 
-            <Link
-              to="/recruiter/dashboard"
-              className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-blue-600"
-            >
-              <FiArrowLeft />
-              Back to Dashboard
-            </Link>
+            <BackLink to="/recruiter/dashboard" className="mb-3">Back to Dashboard</BackLink>
 
-            <h1 className="text-2xl font-bold text-slate-950">
+            <h1 className="text-2xl font-bold text-slate-950 sm:text-3xl">
               Manage Jobs
             </h1>
 
@@ -279,34 +277,41 @@ export default function ManageJobs() {
 
           </div>
 
-          <Link
-            to="/recruiter/jobs/create"
-            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
-          >
-            <FiPlus />
-            Post a Job
-          </Link>
+          <div className="flex shrink-0">
+
+            <Link
+              to="/recruiter/jobs/create"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700 sm:w-auto"
+            >
+              <FiPlus size={18} />
+              Post a Job
+            </Link>
+
+          </div>
 
         </div>
 
-      </div>
+      </header>
 
       {/* =================================================
-          CONTENT
+          MAIN CONTENT
       ================================================= */}
 
-      <main className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-6 py-8 lg:px-8">
 
-        {/* ERROR */}
+        {/* =================================================
+            ERROR
+        ================================================= */}
 
         {error && (
-          <div className="mb-6 flex items-center justify-between rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-600">
+          <div className="mb-6 flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-600 sm:flex-row sm:items-center sm:justify-between">
 
             <span>{error}</span>
 
             <button
+              type="button"
               onClick={fetchJobs}
-              className="font-semibold hover:underline"
+              className="w-fit font-semibold hover:underline"
             >
               Try again
             </button>
@@ -320,11 +325,11 @@ export default function ManageJobs() {
 
         <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
 
-          <div className="flex flex-col gap-4 md:flex-row">
+          <div className="flex flex-col gap-4 lg:flex-row">
 
             {/* SEARCH */}
 
-            <div className="relative flex-1">
+            <div className="relative min-w-0 flex-1">
 
               <FiSearch
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
@@ -338,14 +343,14 @@ export default function ManageJobs() {
                   setSearch(e.target.value)
                 }
                 placeholder="Search jobs, location or company..."
-                className="w-full rounded-xl border border-slate-300 py-3 pl-11 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="w-full rounded-xl border border-slate-300 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
 
             </div>
 
             {/* STATUS */}
 
-            <div className="relative md:w-52">
+            <div className="relative w-full lg:w-52">
 
               <FiFilter
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
@@ -357,7 +362,7 @@ export default function ManageJobs() {
                 onChange={(e) =>
                   setStatusFilter(e.target.value)
                 }
-                className="w-full appearance-none rounded-xl border border-slate-300 bg-white py-3 pl-11 pr-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="w-full appearance-none rounded-xl border border-slate-300 bg-white py-3 pl-11 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="all">
                   All Status
@@ -382,10 +387,17 @@ export default function ManageJobs() {
             {/* REFRESH */}
 
             <button
+              type="button"
               onClick={fetchJobs}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              disabled={loading || actionLoading}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 lg:w-auto"
             >
-              <FiRefreshCw />
+              <FiRefreshCw
+                className={
+                  loading ? "animate-spin" : ""
+                }
+              />
+
               Refresh
             </button>
 
@@ -397,20 +409,25 @@ export default function ManageJobs() {
             JOB COUNT
         ================================================= */}
 
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-5 flex items-center justify-between">
 
           <p className="text-sm text-slate-500">
+
             Showing{" "}
+
             <span className="font-semibold text-slate-900">
               {filteredJobs.length}
             </span>{" "}
-            job{filteredJobs.length !== 1 ? "s" : ""}
+
+            job
+            {filteredJobs.length !== 1 ? "s" : ""}
+
           </p>
 
         </div>
 
         {/* =================================================
-            JOBS
+            NO JOBS
         ================================================= */}
 
         {filteredJobs.length === 0 ? (
@@ -437,7 +454,7 @@ export default function ManageJobs() {
 
             <Link
               to="/recruiter/jobs/create"
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
             >
               <FiPlus />
               Post Your First Job
@@ -447,29 +464,37 @@ export default function ManageJobs() {
 
         ) : (
 
-          <div className="space-y-4">
+          /* =================================================
+             JOB LIST
+          ================================================= */
+
+          <div className="space-y-5">
 
             {filteredJobs.map((job) => (
 
-              <div
+              <article
                 key={job._id}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md"
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md sm:p-6"
               >
 
-                <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                <div className="flex flex-col gap-6">
 
-                  {/* JOB INFO */}
+                  {/* =================================================
+                      JOB INFORMATION
+                  ================================================= */}
 
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0">
 
-                    <div className="flex flex-wrap items-start gap-3">
+                    {/* TITLE + STATUS */}
 
-                      <h2 className="text-xl font-bold text-slate-950">
+                    <div className="flex flex-wrap items-center gap-3">
+
+                      <h2 className="break-words text-xl font-bold text-slate-950">
                         {job.title}
                       </h2>
 
                       <span
-                        className={`rounded-full border px-3 py-1 text-xs font-semibold capitalize ${getStatusStyle(
+                        className={`shrink-0 rounded-full border px-3 py-1 text-xs font-semibold capitalize ${getStatusStyle(
                           job.status
                         )}`}
                       >
@@ -478,20 +503,23 @@ export default function ManageJobs() {
 
                     </div>
 
+                    {/* COMPANY */}
+
                     <p className="mt-2 text-sm font-medium text-slate-600">
-                      {job.company?.name ||
-                        "Company"}
+                      {job.company?.name || "Company"}
                     </p>
 
-                    <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-500">
+                    {/* JOB META */}
+
+                    <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-slate-500">
 
                       <span className="inline-flex items-center gap-2">
-                        <FiMapPin />
+                        <FiMapPin className="shrink-0" />
                         {job.location || "Not specified"}
                       </span>
 
                       <span className="inline-flex items-center gap-2">
-                        <FiBriefcase />
+                        <FiBriefcase className="shrink-0" />
                         {job.jobType || "Full-time"}
                       </span>
 
@@ -503,39 +531,47 @@ export default function ManageJobs() {
 
                     </div>
 
-                    <div className="mt-5 flex flex-wrap gap-6 text-sm">
+                    {/* JOB STATS */}
 
-                      <div>
-                        <span className="text-slate-400">
+                    <div className="mt-6 flex flex-wrap gap-x-10 gap-y-5 border-t border-slate-100 pt-5">
+
+                      <div className="min-w-[90px]">
+
+                        <span className="text-xs font-medium text-slate-400">
                           Applications
                         </span>
 
-                        <p className="mt-1 font-bold text-slate-900">
+                        <p className="mt-1 text-lg font-bold text-slate-900">
                           {job.applicationsCount || 0}
                         </p>
+
                       </div>
 
-                      <div>
-                        <span className="text-slate-400">
+                      <div className="min-w-[70px]">
+
+                        <span className="text-xs font-medium text-slate-400">
                           Views
                         </span>
 
-                        <p className="mt-1 font-bold text-slate-900">
+                        <p className="mt-1 text-lg font-bold text-slate-900">
                           {job.views || 0}
                         </p>
+
                       </div>
 
                       {job.applicationDeadline && (
-                        <div>
-                          <span className="text-slate-400">
+                        <div className="min-w-[120px]">
+
+                          <span className="text-xs font-medium text-slate-400">
                             Deadline
                           </span>
 
-                          <p className="mt-1 font-bold text-slate-900">
+                          <p className="mt-1 text-lg font-bold text-slate-900">
                             {new Date(
                               job.applicationDeadline
                             ).toLocaleDateString()}
                           </p>
+
                         </div>
                       )}
 
@@ -543,70 +579,85 @@ export default function ManageJobs() {
 
                   </div>
 
-                  {/* ACTIONS */}
+                  {/* =================================================
+                      ACTIONS
+                  ================================================= */}
 
-                  <div className="flex flex-wrap gap-2 lg:max-w-xs lg:justify-end">
+                  <div className="flex w-full flex-wrap items-center justify-start gap-2 border-t border-slate-100 pt-5 lg:justify-end">
 
-                    <button
+                    {/* VIEW */}
+
+                    {/* <button
+                      type="button"
                       onClick={() =>
                         navigate(
                           `/recruiter/jobs/${job._id}`
                         )
                       }
-                      className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                      className="inline-flex min-w-[82px] items-center justify-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                     >
-                      <FiEye />
+                      <FiEye size={16} />
                       View
-                    </button>
+                    </button> */}
+
+                    {/* EDIT */}
 
                     <button
+                      type="button"
                       onClick={() =>
                         navigate(
                           `/recruiter/jobs/${job._id}/edit`
                         )
                       }
-                      className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                      className="inline-flex min-w-[82px] items-center justify-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                     >
-                      <FiEdit2 />
+                      <FiEdit2 size={16} />
                       Edit
                     </button>
+
+                    {/* CLOSE / PUBLISH */}
 
                     {job.status === "active" ? (
 
                       <button
+                        type="button"
                         disabled={actionLoading}
                         onClick={() =>
                           handleCloseJob(job._id)
                         }
-                        className="inline-flex items-center gap-2 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-sm font-semibold text-orange-700 hover:bg-orange-100 disabled:opacity-50"
+                        className="inline-flex min-w-[82px] items-center justify-center gap-2 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-sm font-semibold text-orange-700 transition hover:bg-orange-100 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        <FiXCircle />
+                        <FiXCircle size={16} />
                         Close
                       </button>
 
                     ) : (
 
                       <button
+                        type="button"
                         disabled={actionLoading}
                         onClick={() =>
                           handlePublishJob(job._id)
                         }
-                        className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm font-semibold text-green-700 hover:bg-green-100 disabled:opacity-50"
+                        className="inline-flex min-w-[82px] items-center justify-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        <FiCheckCircle />
+                        <FiCheckCircle size={16} />
                         Publish
                       </button>
 
                     )}
 
+                    {/* DELETE */}
+
                     <button
+                      type="button"
                       disabled={actionLoading}
                       onClick={() =>
                         handleDeleteJob(job._id)
                       }
-                      className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 disabled:opacity-50"
+                      className="inline-flex min-w-[82px] items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <FiTrash2 />
+                      <FiTrash2 size={16} />
                       Delete
                     </button>
 
@@ -614,7 +665,7 @@ export default function ManageJobs() {
 
                 </div>
 
-              </div>
+              </article>
 
             ))}
 
@@ -623,6 +674,150 @@ export default function ManageJobs() {
         )}
 
       </main>
+
+      {/* =================================================
+          FOOTER
+      ================================================= */}
+
+   
+
+        <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+
+            {/* BRAND */}
+
+            <div>
+
+              <h2 className="text-xl font-bold">
+                Jobify
+              </h2>
+
+              <p className="mt-3 max-w-sm text-sm leading-6 text-slate-400">
+                Connecting talented people with meaningful
+                opportunities and helping businesses find
+                the right talent.
+              </p>
+
+            </div>
+
+            {/* JOB SEEKERS */}
+
+            <div>
+
+              <h3 className="font-semibold">
+                For Job Seekers
+              </h3>
+
+              <div className="mt-4 flex flex-col gap-3 text-sm text-slate-400">
+
+                <Link
+                  to="/jobs"
+                  className="transition hover:text-white"
+                >
+                  Find Jobs
+                </Link>
+
+                <Link
+                  to="/register"
+                  className="transition hover:text-white"
+                >
+                  Create Profile
+                </Link>
+
+                <Link
+                  to="/register"
+                  className="transition hover:text-white"
+                >
+                  Build Resume
+                </Link>
+
+              </div>
+
+            </div>
+
+            {/* EMPLOYERS */}
+
+            <div>
+
+              <h3 className="font-semibold">
+                For Employers
+              </h3>
+
+              <div className="mt-4 flex flex-col gap-3 text-sm text-slate-400">
+
+                <Link
+                  to="/register"
+                  className="transition hover:text-white"
+                >
+                  Post a Job
+                </Link>
+
+                <Link
+                  to="/register"
+                  className="transition hover:text-white"
+                >
+                  Find Candidates
+                </Link>
+
+              </div>
+
+            </div>
+
+            {/* COMPANY */}
+
+            <div>
+
+              <h3 className="font-semibold">
+                Company
+              </h3>
+
+              <div className="mt-4 flex flex-col gap-3 text-sm text-slate-400">
+
+                <Link
+                  to="/about"
+                  className="transition hover:text-white"
+                >
+                  About
+                </Link>
+
+                <Link
+                  to="/contact"
+                  className="transition hover:text-white"
+                >
+                  Contact
+                </Link>
+
+                <Link
+                  to="/privacy-policy"
+                  className="transition hover:text-white"
+                >
+                  Privacy Policy
+                </Link>
+
+                <Link
+                  to="/terms-and-conditions"
+                  className="transition hover:text-white"
+                >
+                  Terms & Conditions
+                </Link>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div className="mt-10 border-t border-slate-800 pt-6 text-sm text-slate-500">
+
+            © {new Date().getFullYear()} Jobify. All rights reserved.
+
+          </div>
+
+        </div>
+
+      
+      
 
     </div>
   );

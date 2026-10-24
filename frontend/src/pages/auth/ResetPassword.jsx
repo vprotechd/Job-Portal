@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
-  FiArrowLeft,
   FiCheckCircle,
   FiEye,
   FiEyeOff,
   FiLock,
 } from "react-icons/fi";
+import BackLink from "../../components/layout/BackLink";
 
 export default function ResetPassword() {
   const { token } = useParams();
@@ -127,13 +127,7 @@ export default function ResetPassword() {
         <div className="flex items-center justify-center px-6 py-12">
           <div className="w-full max-w-md">
 
-            <Link
-              to="/login"
-              className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-blue-600"
-            >
-              <FiArrowLeft />
-              Back to login
-            </Link>
+            <BackLink to="/login" className="mb-8">Back to login</BackLink>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:p-10">
 

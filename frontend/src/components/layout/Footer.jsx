@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 
 export default function Footer() {
@@ -7,6 +8,7 @@ export default function Footer() {
 
         <div className="grid gap-10 md:grid-cols-4">
 
+          {/* Jobify */}
           <div>
             <h2 className="text-xl font-bold">Jobify</h2>
 
@@ -16,6 +18,7 @@ export default function Footer() {
             </p>
           </div>
 
+          {/* For Job Seekers */}
           <div>
             <h3 className="font-semibold">For Job Seekers</h3>
 
@@ -34,6 +37,7 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* For Employers */}
           <div>
             <h3 className="font-semibold">For Employers</h3>
 
@@ -45,13 +49,10 @@ export default function Footer() {
               <Link to="/register" className="hover:text-white">
                 Find Candidates
               </Link>
-
-              {/* <Link to="/pricing" className="hover:text-white">
-                CV Credits
-              </Link> */}
             </div>
           </div>
 
+          {/* Company */}
           <div>
             <h3 className="font-semibold">Company</h3>
 
@@ -64,17 +65,23 @@ export default function Footer() {
                 Contact
               </Link>
 
-              {/* <Link to="/pricing" className="hover:text-white">
-                Pricing
-              </Link> */}
+              <Link to="/privacy-policy" className="hover:text-white">
+                Privacy Policy
+              </Link>
+
+              <Link to="/terms" className="hover:text-white">
+                Terms & Conditions
+              </Link>
             </div>
           </div>
 
         </div>
 
+        {/* Copyright */}
         <div className="mt-12 border-t border-slate-800 pt-6 text-sm text-slate-500">
           © {new Date().getFullYear()} Jobify. All rights reserved.
         </div>
+
       </div>
     </footer>
   );

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiArrowLeft, FiEye, FiEyeOff, FiLock, FiMail, FiRefreshCw, FiShield } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiLock, FiMail, FiRefreshCw, FiShield } from "react-icons/fi";
 import { toast } from "react-toastify";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import GoogleLoginButton from "../../components/auth/GoogleLoginButton";
+import BackLink from "../../components/layout/BackLink";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ export default function Login() {
         </div>
         <div className="flex items-center justify-center px-6 py-12">
           <div className="w-full max-w-md">
-            <Link to="/" className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-blue-600"><FiArrowLeft /> Back to Jobify</Link>
+            <BackLink to="/" className="mb-8">Back to Jobify</BackLink>
             <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:p-10">
               <h2 className="text-2xl font-bold text-slate-950">Sign in to your account</h2>
               <p className="mt-2 text-sm text-slate-500">Use your password, a login OTP, or Google.</p>

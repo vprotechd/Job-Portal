@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
-  FiArrowLeft,
   FiBriefcase,
   FiCalendar,
   FiCheckCircle,
@@ -20,6 +19,7 @@ import {
 } from "react-icons/fi";
 
 import api from "../../services/api";
+import BackLink from "../../components/layout/BackLink";
 
 export default function ViewApplications() {
   const navigate = useNavigate();
@@ -38,22 +38,132 @@ export default function ViewApplications() {
 
   const downloadResume = async (applicationId) => {
     try {
-      const response = await api.get(`/applications/recruiter/applications/${applicationId}/resume/download`, { responseType: "blob" });
-      const url = URL.createObjectURL(response.data);
+      const token =
+        localStorage.getItem("token") ||
+        sessionStorage.getItem("token") ||
+        localStorage.getItem("accessToken");
+
+      if (!token) {
+        throw new Error("Your login session has expired. Please login again.");
+      }
+
+      const currentApplication =
+        selectedApplication?._id === applicationId
+          ? selectedApplication
+          : applications.find(
+              (application) =>
+                String(application?._id) === String(applicationId)
+            );
+
+      const candidateId =
+        currentApplication?.candidate?._id ||
+        currentApplication?.candidate?.id ||
+        currentApplication?.applicant?._id ||
+        currentApplication?.applicant?.id ||
+        currentApplication?.user?._id ||
+        currentApplication?.user?.id;
+
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      let response;
+
+      try {
+        response = await api.get(
+          `/applications/recruiter/applications/${applicationId}/resume/download`,
+          {
+            responseType: "blob",
+            headers,
+          }
+        );
+      } catch (firstError) {
+        // Some deployed Jobify versions expose the same unlocked CV
+        // through the recruiter candidate endpoint. Use it as a
+        // compatibility fallback without changing the API contract.
+        if (
+          firstError?.response?.status === 401 ||
+          firstError?.response?.status === 404
+        ) {
+          if (!candidateId) throw firstError;
+
+          response = await api.get(
+            `/recruiter/candidates/${candidateId}/resume`,
+            {
+              responseType: "blob",
+              headers,
+            }
+          );
+        } else {
+          throw firstError;
+        }
+      }
+
+      const blob = response.data;
+      if (!(blob instanceof Blob) || blob.size === 0) {
+        throw new Error("The server returned an empty resume file.");
+      }
+
+      const contentType =
+        response.headers?.["content-type"] || "";
+
+      if (contentType.includes("application/json")) {
+        const text = await blob.text();
+        let message = "Unable to download candidate resume.";
+        try {
+          const data = JSON.parse(text);
+          message = data?.message || message;
+        } catch {}
+        throw new Error(message);
+      }
+
+      const contentDisposition =
+        response.headers?.["content-disposition"] || "";
+
+      const filenameMatch =
+        contentDisposition.match(/filename\*?=(?:UTF-8''|")?([^";]+)/i);
+
+      const filename =
+        filenameMatch?.[1]
+          ? decodeURIComponent(filenameMatch[1].replace(/"/g, ""))
+          : "candidate-resume";
+
+      const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = "candidate-resume";
+      anchor.download = filename;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
+
       setSelectedApplication((current) =>
-        current && current._id === applicationId
+        current && String(current._id) === String(applicationId)
           ? { ...current, cvUnlocked: true }
           : current
       );
+
       setTimeout(() => URL.revokeObjectURL(url), 60000);
     } catch (error) {
-      alert(error?.response?.data?.message || "Unable to download candidate resume.");
+      console.error("Resume download error:", error);
+
+      let message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Unable to download candidate resume.";
+
+      // Axios returns a Blob for error responses when responseType is blob.
+      if (
+        error?.response?.data instanceof Blob &&
+        error.response.data.type.includes("application/json")
+      ) {
+        try {
+          const text = await error.response.data.text();
+          const data = JSON.parse(text);
+          message = data?.message || message;
+        } catch {}
+      }
+
+      alert(message);
     }
   };
 
@@ -317,13 +427,7 @@ export default function ViewApplications() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8">
 
           <div>
-            <Link
-              to="/recruiter/dashboard"
-              className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-blue-600"
-            >
-              <FiArrowLeft />
-              Back to Dashboard
-            </Link>
+            <BackLink to="/recruiter/dashboard" className="mb-3">Back to Dashboard</BackLink>
 
             <h1 className="text-2xl font-bold text-slate-950">
               Applications

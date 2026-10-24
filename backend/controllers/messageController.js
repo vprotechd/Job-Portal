@@ -29,8 +29,9 @@ async function authorize(application, userId) {
 
 export const getMessages = async (req, res) => {
   try {
-    const application = await getApplicationForUser(req.params.applicationId, req.user?._id || req.user?.id);
-    const auth = await authorize(application, req.user?._id || req.user?.id);
+    const userId = req.user?._id || req.user?.id;
+    const application = await getApplicationForUser(req.params.applicationId, userId);
+    const auth = await authorize(application, userId);
     if (!auth.ok) return res.status(auth.status).json({ success: false, message: auth.message });
 
     const messages = await Message.find({ application: application._id })
@@ -38,7 +39,11 @@ export const getMessages = async (req, res) => {
       .sort({ createdAt: 1 })
       .lean();
 
-    await Message.updateMany({ application: application._id, recipient: req.user?._id || req.user?.id, readAt: null }, { $set: { readAt: new Date() } });
+    await Message.updateMany(
+      { application: application._id, recipient: userId, readAt: null },
+      { $set: { readAt: new Date() } }
+    );
+
     return res.json({ success: true, application, messages });
   } catch (error) {
     console.error("Get messages error:", error);
@@ -78,7 +83,10 @@ export const sendMessage = async (req, res) => {
 export const getConversations = async (req, res) => {
   try {
     const userId = req.user?._id || req.user?.id;
-    const applications = await Application.find({ $or: [{ candidate: userId }, { recruiter: userId }] })
+
+    const applications = await Application.find({
+      $or: [{ candidate: userId }, { recruiter: userId }],
+    })
       .populate("candidate", "name email profileImage")
       .populate("recruiter", "name email profileImage")
       .populate("job", "title location")
@@ -86,13 +94,31 @@ export const getConversations = async (req, res) => {
       .lean();
 
     const result = [];
+
     for (const application of applications) {
+      // Ignore stale application records instead of allowing one malformed
+      // record to make the whole recruiter Messages page return HTTP 500.
+      if (!application?._id || !application?.candidate?._id || !application?.recruiter?._id) continue;
+
       const auth = await authorize(application, userId);
       if (!auth.ok) continue;
-      const last = await Message.findOne({ application: application._id }).sort({ createdAt: -1 }).lean();
-      const unread = await Message.countDocuments({ application: application._id, recipient: userId, readAt: null });
-      result.push({ ...application, lastMessage: last, unreadCount: unread });
+
+      const last = await Message.findOne({ application: application._id })
+        .sort({ createdAt: -1 })
+        .lean();
+      const unread = await Message.countDocuments({
+        application: application._id,
+        recipient: userId,
+        readAt: null,
+      });
+
+      result.push({
+        ...application,
+        lastMessage: last || null,
+        unreadCount: unread,
+      });
     }
+
     return res.json({ success: true, conversations: result });
   } catch (error) {
     console.error("Get conversations error:", error);

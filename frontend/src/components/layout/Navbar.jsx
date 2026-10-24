@@ -194,13 +194,13 @@ export default function Navbar() {
               Companies
             </Link>
 
-            {/* <Link
+            <Link
               to="/pricing"
               onClick={closeMenu}
               className="text-sm font-medium text-slate-700"
             >
               Pricing
-            </Link> */}
+            </Link>
 
             <Link
               to="/about"

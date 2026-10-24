@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import PublicLayout from "../layouts/PublicLayout";
 import ProtectedRoute from "./ProtectedRoute";
+import BackButton from "../components/layout/BackButton";
+import UserQuickActions from "../components/layout/UserQuickActions";
 
 // ==================== PUBLIC PAGES ====================
 import Home from "../pages/public/Home";
@@ -28,6 +30,11 @@ import ViewApplications from "../pages/recruiter/ViewApplications";
 import CandidateSearch from "../pages/recruiter/CandidateSearch";
 import CvPackages from "../pages/recruiter/CvPackages";
 import Messages from "../pages/Messages";
+import ViewJob from "../pages/recruiter/ViewJob";
+import EditJob from "../pages/recruiter/EditJob";
+
+
+
 
 // ==================== ADMIN ====================
 import AdminDashboard from "../pages/admin/AdminDashboard";
@@ -52,11 +59,23 @@ import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 import VerifyOTP from "../pages/auth/VerifyOTP";
 
+import PrivacyPolicy from "../pages/PrivacyPolicy";
+import TermsAndConditions from "../pages/TermsAndConditions";
+
+
 // ==================== PROTECTED ROUTE WRAPPER ====================
 const Protected = ({ role, children }) => {
   return (
     <ProtectedRoute allowedRoles={[role]}>
-      {children}
+      <div className="min-h-screen">
+        <div className="sticky top-0 z-40 border-b border-slate-200 bg-slate-50/95 px-4 py-2.5 backdrop-blur sm:px-6 lg:px-8">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+            <BackButton />
+            <UserQuickActions />
+          </div>
+        </div>
+        {children}
+      </div>
     </ProtectedRoute>
   );
 };
@@ -81,6 +100,16 @@ export default function AppRoutes() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+
+        <Route
+  path="/privacy-policy"
+  element={<PrivacyPolicy />}
+/>
+
+<Route
+  path="/terms-and-conditions"
+  element={<TermsAndConditions />}
+/>
       </Route>
 
 
@@ -256,6 +285,24 @@ export default function AppRoutes() {
           </Protected>
         }
       />
+
+      <Route
+  path="/recruiter/jobs/:id"
+  element={
+    <ProtectedRoute allowedRoles={["recruiter"]}>
+      <ViewJob />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/recruiter/jobs/:id/edit"
+  element={
+    <ProtectedRoute allowedRoles={["recruiter"]}>
+      <EditJob />
+    </ProtectedRoute>
+  }
+/>
 
 
       {/* =====================================================

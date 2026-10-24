@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { FiArrowLeft, FiMessageCircle, FiSend } from "react-icons/fi";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { FiMessageCircle, FiSend } from "react-icons/fi";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
+import BackLink from "../components/layout/BackLink";
 
 function Chat({ applicationId }) {
   const { user } = useAuth();
@@ -51,7 +52,7 @@ function Chat({ applicationId }) {
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-8 lg:px-8">
-      <Link to={user?.role === "recruiter" ? "/recruiter/applications/view" : "/candidate/applications"} className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-blue-600"><FiArrowLeft /> Back to Applications</Link>
+      <BackLink to={user?.role === "recruiter" ? "/recruiter/applications/view" : "/candidate/applications"} className="mb-6">Back to Applications</BackLink>
       <div className="mb-5">
         <h1 className="text-2xl font-bold text-slate-950">Messages</h1>
         <p className="mt-1 text-sm text-slate-500">{application?.job?.title || "Application"} · {user?.role === "recruiter" ? application?.candidate?.name : application?.recruiter?.name}</p>

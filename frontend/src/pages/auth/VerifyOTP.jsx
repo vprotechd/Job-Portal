@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import {
-  FiArrowLeft,
   FiCheckCircle,
   FiMail,
   FiRefreshCw,
 } from "react-icons/fi";
+import BackLink from "../../components/layout/BackLink";
 
 export default function VerifyOTP() {
   const navigate = useNavigate();
@@ -201,13 +201,7 @@ export default function VerifyOTP() {
         <div className="flex items-center justify-center px-6 py-12">
           <div className="w-full max-w-md">
 
-            <Link
-              to="/register"
-              className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-blue-600"
-            >
-              <FiArrowLeft />
-              Back to Register
-            </Link>
+            <BackLink to="/register" className="mb-8">Back to Register</BackLink>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:p-10">
 

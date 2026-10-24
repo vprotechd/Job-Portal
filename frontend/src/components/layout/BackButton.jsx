@@ -1,4 +1,3 @@
-
 import { useLocation, useNavigate } from "react-router-dom";
 import { FiArrowLeft } from "react-icons/fi";
 
@@ -21,8 +20,11 @@ export default function BackButton() {
     : "/";
 
   const handleBack = () => {
-    if (window.history.length > 1) navigate(-1);
-    else navigate(fallback);
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate(fallback);
+    }
   };
 
   return (
@@ -31,10 +33,15 @@ export default function BackButton() {
       onClick={handleBack}
       aria-label="Go back"
       title="Go back"
-      className="fixed right-35 top-[95px] z-40 inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white/95 px-3 text-sm font-semibold text-slate-700 shadow-md backdrop-blur transition hover:border-blue-300 hover:text-blue-600"
+      className="global-back-btn group inline-flex items-center gap-2.5 rounded-full border border-slate-200 bg-white py-1.5 pl-1.5 pr-4 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:border-blue-300 hover:bg-blue-50/60 hover:text-blue-700 hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
     >
-      <FiArrowLeft size={17} />
-      <span className="hidden sm:inline">Back</span>
+      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-all duration-200 group-hover:bg-blue-600 group-hover:text-white">
+        <FiArrowLeft
+          size={15}
+          className="transition-transform duration-200 group-hover:-translate-x-0.5"
+        />
+      </span>
+      <span>Back</span>
     </button>
   );
 }

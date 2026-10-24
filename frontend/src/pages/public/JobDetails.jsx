@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import api from "../../services/api";
 import {
-  FiArrowLeft,
   FiBriefcase,
   FiCalendar,
   FiClock,
@@ -12,6 +11,7 @@ import {
   FiShare2,
   FiUsers,
 } from "react-icons/fi";
+import BackLink from "../../components/layout/BackLink";
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -157,13 +157,7 @@ export default function JobDetails() {
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-8">
 
-          <Link
-            to="/jobs"
-            className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-blue-600"
-          >
-            <FiArrowLeft />
-            Back to jobs
-          </Link>
+          <BackLink to="/jobs">Back to jobs</BackLink>
 
           <div className="mt-8 flex flex-col gap-6 md:flex-row md:items-start">
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { FiArrowLeft, FiMail, FiCheckCircle } from "react-icons/fi";
+import { FiMail, FiCheckCircle } from "react-icons/fi";
+import BackLink from "../../components/layout/BackLink";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -55,13 +56,7 @@ export default function ForgotPassword() {
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-6 py-12">
       <div className="w-full max-w-md">
 
-        <Link
-          to="/login"
-          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-blue-600"
-        >
-          <FiArrowLeft />
-          Back to login
-        </Link>
+        <BackLink to="/login" className="mb-8">Back to login</BackLink>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
 

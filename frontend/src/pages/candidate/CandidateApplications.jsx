@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiArrowLeft, FiBriefcase, FiMessageCircle } from "react-icons/fi";
+import { FiBriefcase, FiMessageCircle } from "react-icons/fi";
 import api from "../../services/api";
+import BackLink from "../../components/layout/BackLink";
 
 export default function CandidateApplications() {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ export default function CandidateApplications() {
   return (
     <div className="min-h-screen bg-slate-50">
       <main className="mx-auto max-w-5xl px-6 py-8 lg:px-8">
-        <Link to="/candidate/dashboard" className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-blue-600"><FiArrowLeft /> Back to Dashboard</Link>
+        <BackLink to="/candidate/dashboard" className="mb-6">Back to Dashboard</BackLink>
         <h1 className="text-3xl font-bold text-slate-950">My Applications</h1>
         <p className="mt-2 text-slate-500">Track applications submitted for jobs.</p>
         {error && <div className="mt-6 rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</div>}

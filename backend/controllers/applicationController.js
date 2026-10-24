@@ -6,6 +6,7 @@ import Job from "../models/Job.js";
 import User from "../models/User.js";
 import CvAccess from "../models/CvAccess.js";
 import { getCvAccessState, unlockCandidate } from "../services/cvAccessService.js";
+import { sendResume } from "../utils/resumeDownload.js";
 import Notification from "../models/Notification.js";
 
 // =====================================================
@@ -484,27 +485,23 @@ export const downloadCandidateResume = async (req, res) => {
     if (!recruiterId) return res.status(401).json({ success: false, message: "Authentication required." });
     if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ success: false, message: "Invalid application ID." });
 
-    const application = await Application.findOne({ _id: id, recruiter: recruiterId }).populate("candidate", "_id name resume").lean();
+    const application = await Application.findOne({ _id: id, recruiter: recruiterId })
+      .populate("candidate", "_id name resume")
+      .lean();
     if (!application) return res.status(404).json({ success: false, message: "Application not found." });
+
     const candidate = application.candidate;
     if (!candidate?.resume) return res.status(404).json({ success: false, message: "This candidate has not uploaded a resume." });
 
-    const result = await unlockCandidate({ recruiterId, candidateId: candidate._id });
-    const access = result.access;
+    // Reuse existing access whenever the CV was already unlocked. This avoids
+    // charging a second free unit/credit just because the recruiter downloads it.
+    const existingAccess = await CvAccess.findOne({ recruiter: recruiterId, candidate: candidate._id });
+    const access = existingAccess || (await unlockCandidate({ recruiterId, candidateId: candidate._id })).access;
+    if (!access.viewedAt) access.viewedAt = new Date();
     access.downloadedAt = access.downloadedAt || new Date();
     await access.save();
 
-    let filename = String(candidate.resume).trim();
-    if (/^https?:\/\//i.test(filename)) {
-      const parsed = new URL(filename);
-      if (parsed.origin !== `${req.protocol}://${req.get("host")}`) return res.status(400).json({ success: false, message: "External resume URLs cannot be downloaded through Jobify." });
-      filename = parsed.pathname;
-    }
-    filename = path.basename(filename.replace(/^\/+/, "").replace(/^uploads[\\/]/i, ""));
-    const filePath = path.join(process.cwd(), "uploads", filename);
-    if (!fs.existsSync(filePath)) return res.status(404).json({ success: false, message: "Resume file is no longer available on the server." });
-    const safeName = String(candidate.name || "candidate").replace(/[^a-zA-Z0-9_-]+/g, "-") || "candidate";
-    return res.download(filePath, `${safeName}-resume${path.extname(filename) || ".pdf"}`);
+    return await sendResume(res, candidate.resume, candidate.name);
   } catch (error) {
     console.error("Download candidate resume error:", error);
     return res.status(error.status || 500).json({ success: false, message: error.message || "Unable to download candidate resume." });

@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
-  FiArrowLeft,
   FiBriefcase,
   FiGlobe,
   FiMapPin,
   FiUsers,
 } from "react-icons/fi";
 import api from "../../services/api";
+import BackLink from "../../components/layout/BackLink";
 
 export default function CompanyDetails() {
   const { id } = useParams();
@@ -125,13 +125,7 @@ export default function CompanyDetails() {
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-10">
 
-          <Link
-            to="/companies"
-            className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-blue-600"
-          >
-            <FiArrowLeft />
-            Back to companies
-          </Link>
+          <BackLink to="/companies" className="mb-8">Back to companies</BackLink>
 
           <div className="flex flex-col gap-6 md:flex-row md:items-center">
 

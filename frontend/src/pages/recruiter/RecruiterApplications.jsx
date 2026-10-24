@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
 import {
-  FiArrowLeft,
   FiBriefcase,
   FiCalendar,
   FiCheck,
@@ -17,6 +16,7 @@ import {
   FiUsers,
   FiX,
 } from "react-icons/fi";
+import BackLink from "../../components/layout/BackLink";
 
 const STATUS_OPTIONS = ["pending", "reviewing", "shortlisted", "interview", "accepted", "rejected"];
 
@@ -537,13 +537,7 @@ export default function RecruiterApplications() {
         <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
 
           <div>
-            <Link
-              to="/recruiter/dashboard"
-              className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-blue-600"
-            >
-              <FiArrowLeft size={16} />
-              Back to Dashboard
-            </Link>
+            <BackLink to="/recruiter/dashboard" className="mb-3">Back to Dashboard</BackLink>
 
             <p className="text-sm font-semibold text-blue-600">
               Recruiter

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  FiArrowLeft,
   FiEye,
   FiEyeOff,
   FiLock,
@@ -11,6 +10,7 @@ import {
 } from "react-icons/fi";
 
 import api from "../../services/api";
+import BackLink from "../../components/layout/BackLink";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -155,13 +155,7 @@ export default function Register() {
           <div className="w-full max-w-md">
 
             {/* Back */}
-            <Link
-              to="/"
-              className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition hover:text-blue-600"
-            >
-              <FiArrowLeft />
-              Back to Jobify
-            </Link>
+            <BackLink to="/" className="mb-8">Back to Jobify</BackLink>
 
             {/* Card */}
             <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:p-10">

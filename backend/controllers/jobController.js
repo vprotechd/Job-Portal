@@ -538,38 +538,104 @@ export const updateJob = async (req, res) => {
       });
     }
 
-    const allowedFields = [
-      "title",
-      "description",
-      "location",
-      "workMode",
-      "jobType",
-      "experience",
-      "salaryMin",
-      "salaryMax",
-      "salaryCurrency",
-      "skills",
-      "requirements",
-      "responsibilities",
-      "applicationDeadline",
-    ];
+    const body = req.body || {};
 
-    allowedFields.forEach((field) => {
-      if (req.body[field] !== undefined) {
-        job[field] = req.body[field];
+    // ---- helpers -------------------------------------------------
+    const jobTypeMap = {
+      "full-time": "full-time", "part-time": "part-time", contract: "contract",
+      internship: "internship", freelance: "freelance",
+    };
+    const workModeMap = {
+      onsite: "onsite", "on-site": "onsite", remote: "remote", hybrid: "hybrid",
+    };
+    const toList = (value, separator) =>
+      Array.isArray(value)
+        ? value.map((item) => String(item).trim()).filter(Boolean)
+        : String(value ?? "")
+            .split(separator)
+            .map((item) => item.trim())
+            .filter(Boolean);
+    const toNumberOrNull = (value) =>
+      value === "" || value === null || value === undefined
+        ? null
+        : Number(value);
+
+    // ---- plain text fields ----------------------------------------
+    if (body.title !== undefined) {
+      const title = String(body.title).trim();
+      if (!title) {
+        return res.status(400).json({ success: false, message: "Job title is required." });
       }
-    });
-
-    if (job.title) {
-      job.title = job.title.trim();
+      job.title = title;
     }
 
-    if (job.description) {
-      job.description = job.description.trim();
+    if (body.description !== undefined) {
+      const description = String(body.description).trim();
+      if (!description) {
+        return res.status(400).json({ success: false, message: "Job description is required." });
+      }
+      job.description = description;
     }
 
-    if (job.location) {
-      job.location = job.location.trim();
+    if (body.location !== undefined) job.location = String(body.location).trim();
+    if (body.experience !== undefined) job.experience = String(body.experience).trim();
+    if (body.salaryCurrency !== undefined && body.salaryCurrency) {
+      job.salaryCurrency = String(body.salaryCurrency);
+    }
+
+    // ---- enums (accept "Full-time" / "On-site" style labels too) ----
+    if (body.jobType !== undefined) {
+      const mapped = jobTypeMap[String(body.jobType).trim().toLowerCase()];
+      if (!mapped) {
+        return res.status(400).json({ success: false, message: "Invalid job type." });
+      }
+      job.jobType = mapped;
+    }
+
+    if (body.workMode !== undefined) {
+      const mapped = workModeMap[String(body.workMode).trim().toLowerCase()];
+      if (!mapped) {
+        return res.status(400).json({ success: false, message: "Invalid work mode." });
+      }
+      job.workMode = mapped;
+    }
+
+    // ---- salary ---------------------------------------------------
+    if (body.salaryMin !== undefined) {
+      const value = toNumberOrNull(body.salaryMin);
+      if (value !== null && Number.isNaN(value)) {
+        return res.status(400).json({ success: false, message: "Invalid minimum salary." });
+      }
+      job.salaryMin = value;
+    }
+
+    if (body.salaryMax !== undefined) {
+      const value = toNumberOrNull(body.salaryMax);
+      if (value !== null && Number.isNaN(value)) {
+        return res.status(400).json({ success: false, message: "Invalid maximum salary." });
+      }
+      job.salaryMax = value;
+    }
+
+    // ---- lists (arrays in the schema; accept strings from forms) --------
+    if (body.skills !== undefined) job.skills = toList(body.skills, ",");
+    if (body.requirements !== undefined) job.requirements = toList(body.requirements, "\n");
+    if (body.responsibilities !== undefined) job.responsibilities = toList(body.responsibilities, "\n");
+
+    // ---- deadline (accept applicationDeadline or deadline) ----------
+    const deadlineInput =
+      body.applicationDeadline !== undefined ? body.applicationDeadline : body.deadline;
+
+    if (deadlineInput !== undefined) {
+      if (deadlineInput === null || deadlineInput === "") {
+        job.applicationDeadline = null;
+      } else {
+        const parsed = new Date(deadlineInput);
+        if (Number.isNaN(parsed.getTime())) {
+          return res.status(400).json({ success: false, message: "Invalid application deadline." });
+        }
+        job.applicationDeadline = parsed;
+      }
     }
 
     if (
@@ -581,8 +647,7 @@ export const updateJob = async (req, res) => {
     ) {
       return res.status(400).json({
         success: false,
-        message:
-          "Minimum salary cannot be greater than maximum salary.",
+        message: "Minimum salary cannot be greater than maximum salary.",
       });
     }
 

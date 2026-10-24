@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
-  FiArrowLeft,
   FiBriefcase,
   FiCheckCircle,
   FiFileText,
@@ -18,6 +17,7 @@ import { toast } from "react-toastify";
 
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import BackLink from "../../components/layout/BackLink";
 
 const EMPTY_FORM = {
   name: "",
@@ -258,12 +258,7 @@ export default function CandidateProfile() {
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <Link
-              to="/candidate/dashboard"
-              className="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-blue-600"
-            >
-              <FiArrowLeft /> Back to Dashboard
-            </Link>
+            <BackLink to="/candidate/dashboard" className="mb-4">Back to Dashboard</BackLink>
             <p className="text-sm font-semibold uppercase tracking-wide text-blue-600">Candidate Profile</p>
             <h1 className="mt-1 text-3xl font-bold text-slate-950">Complete your professional profile</h1>
             <p className="mt-2 text-slate-500">Recruiters will use these details when reviewing your applications.</p>

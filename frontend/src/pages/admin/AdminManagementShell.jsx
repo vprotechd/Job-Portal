@@ -1,12 +1,12 @@
-import { Link } from "react-router-dom";
-import { FiArrowLeft, FiRefreshCw } from "react-icons/fi";
+import { FiRefreshCw } from "react-icons/fi";
+import BackLink from "../../components/layout/BackLink";
 
 export default function AdminManagementShell({ title, description, onRefresh, children, actions }) {
   return (
     <div className="min-h-screen bg-slate-50">
       <main className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <Link to="/admin/dashboard" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-blue-600"><FiArrowLeft /> Back to Dashboard</Link>
+          <BackLink to="/admin/dashboard">Back to Dashboard</BackLink>
           <div className="flex gap-2">{actions}{onRefresh && <button onClick={onRefresh} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:text-blue-600"><FiRefreshCw /> Refresh</button>}</div>
         </div>
         <p className="text-sm font-semibold text-blue-600">Admin</p>
